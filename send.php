@@ -1,42 +1,27 @@
-<?php
-// توکن ربات رو همینجا بذار
-$token   = 'bot313340:072950e2-318c-45d8-b879-11f9eeb58bbb';
-$chat_id = 10200307; // آیدی چت یا کانال
+$token = 'bot313340:072950e2-318c-45d8-b879-11f9eeb58bbb';
+$chat_id = 10200307;
 $caption = 'سلام!';
-$title   = 'ارسال فایل با API';
+$title = 'send file by api';
 
-// مسیر فایل برای ارسال
-$file = __DIR__ . 'https://ehsanpg.ir/icon.jpeg'; // فایل در کنار همین اسکریپت
+// initialise the curl request
+$request = curl_init('https://eitaayar.ir/api/'.$token.'/sendFile');
 
-if (!file_exists($file)) {
-    die("❌ فایل پیدا نشد: $file");
-}
+// send a file
+curl_setopt($request, CURLOPT_POST, true);
+curl_setopt($request, CURLOPT_SSL_VERIFYHOST, 0);
+curl_setopt($request, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt(
+    $request, CURLOPT_POSTFIELDS,
+    array(
+        'file' => new \CurlFile(realpath('https://ehsanpg.ir/icon.jpeg')),
+        'chat_id' => $chat_id,
+        'title' => $title,
+        'caption' => $caption,
+    ));
 
-$url = "https://eitaayar.ir/api/$token/sendFile";
+// output the response
+curl_setopt($request, CURLOPT_RETURNTRANSFER, true);
+echo curl_exec($request);
 
-$post_fields = [
-    'file'    => new CURLFile(realpath($file)),
-    'chat_id' => $chat_id,
-    'title'   => $title,
-    'caption' => $caption,
-];
-
-$ch = curl_init();
-curl_setopt_array($ch, [
-    CURLOPT_URL            => $url,
-    CURLOPT_POST           => true,
-    CURLOPT_POSTFIELDS     => $post_fields,
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_SSL_VERIFYHOST => 0,
-    CURLOPT_SSL_VERIFYPEER => false,
-]);
-
-$response = curl_exec($ch);
-
-if (curl_errno($ch)) {
-    echo "cURL Error: " . curl_error($ch);
-} else {
-    echo "Response: " . $response;
-}
-
-curl_close($ch);
+// close the session
+curl_close($request);
